@@ -2,7 +2,7 @@ const express = require('express');
 //const puppeteer = require('puppeteer');
 
 const app = express();
-const PORT = 2000;
+const PORT = process.env.PORT || 2000;
 
 // async function getPageSource(url) {
 //   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
