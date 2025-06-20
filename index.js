@@ -2,7 +2,7 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 
 const app = express();
-const PORT = 2000;
+const PORT = 8080;
 
 async function getPageSource(url) {
   const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox'] });
@@ -34,6 +34,6 @@ app.get('/get-page-source', async (req, res) => {
 });
 
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server started http://localhost:${PORT}`);
 });
