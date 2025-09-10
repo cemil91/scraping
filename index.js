@@ -4,7 +4,6 @@ const axios = require('axios');
 const app = express();
 const PORT = process.env.PORT || 2000;
 
-// HTML içinden CSRF token çıkar
 function extractCsrfToken(html) {
   const match = html.match(/<meta name="csrf-token" content="([^"]+)"\s*\/?>/i);
   return match ? match[1] : null;
@@ -31,18 +30,12 @@ app.get('/get-page-source', async (req, res) => {
   }
 
   try {
-    // 1) Sayfa kaynağını al
     const page = await getPageSource(url);
-
-    // 2) CSRF token çıkar
     const csrfToken = extractCsrfToken(page.html);
+
     let phoneXml = '';
-
     if (csrfToken) {
-      // 3) Cookie hazırla
       const cookieHeader = page.cookies.map((c) => c.split(';')[0]).join('; ');
-
-      // 4) Telefon API URL
       const phoneApiUrl =
         url +
         '/show_phones?trigger_button=main&source_link=' +
@@ -63,7 +56,10 @@ app.get('/get-page-source', async (req, res) => {
 
         if (phoneResponse.data && Array.isArray(phoneResponse.data.phones)) {
           phoneXml = phoneResponse.data.phones
-            .map((p) => `<phone>${p}</phone>`)
+            .map(
+              (p) =>
+                `<phone raw="${p.raw}">${p.primary || p.raw}</phone>`
+            )
             .join('');
         }
       } catch (e) {
@@ -71,9 +67,7 @@ app.get('/get-page-source', async (req, res) => {
       }
     }
 
-    // 5) HTML + phone ekle
     const finalHtml = page.html + phoneXml;
-
     res.status(200).send(finalHtml);
   } catch (error) {
     res.status(500).send(`error: ${error.message}`);
