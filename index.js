@@ -23,6 +23,11 @@ async function getPageSource(url) {
   };
 }
 
+function formatPhone(raw) {
+  // +994'ü 0 ilə əvəzlə
+  return raw.replace(/^\+994/, '0');
+}
+
 app.get('/get-page-source', async (req, res) => {
   const { url } = req.query;
   if (!url) {
@@ -56,10 +61,7 @@ app.get('/get-page-source', async (req, res) => {
 
         if (phoneResponse.data && Array.isArray(phoneResponse.data.phones)) {
           phoneXml = phoneResponse.data.phones
-            .map(
-              (p) =>
-                `<phone raw="${p.raw}">${p.primary || p.raw}</phone>`
-            )
+            .map((p) => `<phone>${formatPhone(p.raw)}</phone>`)
             .join('');
         }
       } catch (e) {
